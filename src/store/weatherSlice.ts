@@ -15,7 +15,6 @@ const initialState: WeatherState = {
   error: null,
 };
 
-// Replace `YOUR_API_KEY` with your actual weather API key.
 export const fetchWeather = createAsyncThunk(
   'weather/fetchWeather',
   async (_, { getState }) => {
@@ -24,7 +23,7 @@ export const fetchWeather = createAsyncThunk(
 
     if (latitude && longitude) {
       const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=YOUR_API_KEY`
+        `todo: real-api`
       );
       return response.data;
     }

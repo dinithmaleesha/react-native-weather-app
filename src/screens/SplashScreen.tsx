@@ -1,20 +1,55 @@
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
-import { Colors } from '../shared/styles/colors';
-import { rms, rv } from '../shared/styles/responsive';
-import DeviceInfo from 'react-native-device-info';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { AppDispatch, RootState } from '../store/store';
+import { setLocation, setLocationError } from '../store/locationSlice';
+import { fetchWeather } from '../store/weatherSlice';
+import Geolocation from '@react-native-community/geolocation';
 
 const SplashScreen = () => {
-  const version = DeviceInfo.getVersion();
-  const buildNumber = DeviceInfo.getBuildNumber();
+  const dispatch = useDispatch<AppDispatch>();
+  const weather = useSelector((state: RootState) => state.weather);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    // const getLocationAndWeather = async (dispatch: AppDispatch) => {
+    //   const hasPermission = await requestLocationPermission();
+    
+    //   if (hasPermission) {
+    //     Geolocation.getCurrentPosition(
+    //       (position: GeolocationPosition) => {
+    //         const { latitude, longitude } = position.coords;
+    //         dispatch(setLocation({ latitude, longitude })); // Set location in Redux
+    //         dispatch(fetchWeather()); // Fetch weather data
+    //       },
+    //       (error: GeolocationPositionError) => {
+    //         dispatch(setLocationError(error.message)); // Handle error
+    //       }
+    //     );
+    //   } else {
+    //     dispatch(setLocationError('Location permission denied'));
+    //   }
+    // };
+
+    // getLocationAndWeather();
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (weather.data && !weather.loading && !weather.error) {
+      navigation.navigate('Home');
+    }
+  }, [weather, navigation]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.appName}>Weather Wave</Text>
-
       <View style={styles.bottomContainer}>
-        <Text style={styles.launchingText}>Launching...</Text>
-        <Text style={styles.versionText}>v{version} ({buildNumber})</Text>
+        {weather.loading ? (
+          <Text style={styles.loadingText}>Fetching weather...</Text>
+        ) : weather.error ? (
+          <Text style={styles.errorText}>{weather.error}</Text>
+        ) : null}
       </View>
     </View>
   );
@@ -27,25 +62,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.primary
+    backgroundColor: '#1E1E1E',
   },
   appName: {
-    fontSize: rms(32),
+    fontSize: 32,
     fontWeight: 'bold',
-    color: Colors.white
+    color: '#FFF',
   },
   bottomContainer: {
     position: 'absolute',
-    bottom: rv(10),
+    bottom: 20,
     alignItems: 'center',
   },
-  launchingText: {
-    fontSize: rms(16),
-    color: Colors.white,
-    marginBottom: rv(5),
+  loadingText: {
+    color: '#FFF',
   },
-  versionText: {
-    fontSize: rms(12),
-    color: Colors.white
+  errorText: {
+    color: 'red',
   },
 });
