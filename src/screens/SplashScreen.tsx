@@ -1,55 +1,37 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+import { Colors } from '../shared/styles/colors';
+import { rs, rv } from '../shared/styles/responsive';
 import { AppDispatch, RootState } from '../store/store';
-import { setLocation, setLocationError } from '../store/locationSlice';
-import { fetchWeather } from '../store/weatherSlice';
-import Geolocation from '@react-native-community/geolocation';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { getWeather } from '../store/weatherAction';
 
-const SplashScreen = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const weather = useSelector((state: RootState) => state.weather);
-  const navigation = useNavigation();
+type SplashScreenProps = {
+  navigation: NavigationProp<any>;
+};
 
-  useEffect(() => {
-    // const getLocationAndWeather = async (dispatch: AppDispatch) => {
-    //   const hasPermission = await requestLocationPermission();
-    
-    //   if (hasPermission) {
-    //     Geolocation.getCurrentPosition(
-    //       (position: GeolocationPosition) => {
-    //         const { latitude, longitude } = position.coords;
-    //         dispatch(setLocation({ latitude, longitude })); // Set location in Redux
-    //         dispatch(fetchWeather()); // Fetch weather data
-    //       },
-    //       (error: GeolocationPositionError) => {
-    //         dispatch(setLocationError(error.message)); // Handle error
-    //       }
-    //     );
-    //   } else {
-    //     dispatch(setLocationError('Location permission denied'));
-    //   }
-    // };
-
-    // getLocationAndWeather();
-  }, [dispatch]);
+const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
+  const { splashText, loading } = useSelector((state: RootState) => state.weather);
+  const dispatch = useDispatch<AppDispatch>()
 
   useEffect(() => {
-    if (weather.data && !weather.loading && !weather.error) {
-      navigation.navigate('Home');
+    dispatch(getWeather())
+    if(!loading) {
+      const timer = setTimeout(() => {
+        navigation.navigate('HomeScreen')
+      }, 2000);
+  
+      return () => clearTimeout(timer);
     }
-  }, [weather, navigation]);
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.appName}>Weather Wave</Text>
       <View style={styles.bottomContainer}>
-        {weather.loading ? (
-          <Text style={styles.loadingText}>Fetching weather...</Text>
-        ) : weather.error ? (
-          <Text style={styles.errorText}>{weather.error}</Text>
-        ) : null}
+        <Text style={styles.splashText}>{splashText}</Text>
+        <Text style={styles.bottomText}>Version 1.0.1</Text>
       </View>
     </View>
   );
@@ -62,22 +44,24 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1E1E1E',
+    backgroundColor: Colors.primary,
   },
   appName: {
-    fontSize: 32,
+    fontSize: rs(32),
     fontWeight: 'bold',
-    color: '#FFF',
+    color: Colors.white,
   },
   bottomContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: rs(10),
     alignItems: 'center',
   },
-  loadingText: {
-    color: '#FFF',
+  bottomText: {
+    color: Colors.white,
   },
-  errorText: {
-    color: 'red',
-  },
+  splashText: {
+    color: Colors.white,
+    fontSize: rs(14),
+    marginBottom: rv(10)
+  }
 });

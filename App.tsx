@@ -1,24 +1,21 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import React from 'react';
-import SplashScreen from './src/screens/SplashScreen';
-import HomeScreen from './src/screens/HomeScreen';
+import {NavigationContainer} from '@react-navigation/native';
 import { Provider } from 'react-redux';
+import SplashScreen from './src/screens/SplashScreen';
 import { store } from './src/store/store';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-
-const Stack = createStackNavigator();
+import MainStack from './src/navigation/MainStack';
+import TestScreen from './src/screens/test_screen';
 
 const App = () => {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Splash">
-          <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Weather Details' }} />
-        </Stack.Navigator>
+        <MainStack/>
       </NavigationContainer>
     </Provider>
+    // <Text style={{alignContent:'center'}}>Hey</Text>
+    // <TestScreen/>
   );
 };
 

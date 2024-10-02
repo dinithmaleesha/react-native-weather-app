@@ -1,23 +1,34 @@
+import { NavigationProp } from '@react-navigation/native';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 
+type HomeScreenProps = {
+  navigation: NavigationProp<any>;
+};
 
-const HomeScreen = () => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const weather = useSelector((state: RootState) => state.weather);
+
+  if (!weather.weather || !weather.weather.current) {
+    return (
+      <View style={styles.container}>
+        <Text>No weather data available</Text>
+      </View>
+    );
+  }
+
+  const { temperature_2m, precipitation, time } = weather.weather.current;
 
   return (
     <View style={styles.container}>
-      {weather.data ? (
-        <>
-          <Text style={styles.header}>Weather Details</Text>
-          <Text style={styles.tempText}>Temperature: {weather.data.main.temp}°C</Text>
-          <Text style={styles.descText}>Description: {weather.data.weather[0].description}</Text>
-        </>
-      ) : (
-        <Text style={styles.errorText}>Failed to load weather data</Text>
-      )}
+      <Text style={styles.title}>Weather Information</Text>
+      
+      <Text style={styles.text}>Temperature: {temperature_2m}°C</Text>
+      <Text style={styles.text}>Precipitation: {precipitation} mm</Text>
+      <Text style={styles.text}>Time: {new Date(time).toLocaleString()}</Text>
+
     </View>
   );
 };
@@ -29,23 +40,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1E1E1E',
+    padding: 20,
   },
-  header: {
+  title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFF',
+    marginBottom: 20,
   },
-  tempText: {
-    fontSize: 20,
-    color: '#FFF',
-    marginVertical: 10,
-  },
-  descText: {
-    fontSize: 16,
-    color: '#FFF',
-  },
-  errorText: {
-    color: 'red',
+  text: {
+    fontSize: 18,
+    marginBottom: 10,
   },
 });
