@@ -19,7 +19,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
     dispatch(getWeather())
     if(!loading) {
       const timer = setTimeout(() => {
-        navigation.navigate('HomeScreen')
+        navigation.replace('HomeScreen')
       }, 2000);
   
       return () => clearTimeout(timer);
