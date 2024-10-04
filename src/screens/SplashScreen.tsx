@@ -6,6 +6,7 @@ import { rs, rv } from '../shared/styles/responsive';
 import { AppDispatch, RootState } from '../store/store';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { getWeather } from '../store/weatherAction';
+import { requestLocationPermission } from '../services/location_permission'
 
 type SplashScreenProps = {
   navigation: NavigationProp<any>;
@@ -16,6 +17,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
 
   useEffect(() => {
+    requestLocationPermission();
     dispatch(getWeather())
     if(!loading) {
       const timer = setTimeout(() => {
