@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Colors } from '../shared/styles/colors';
 import { rs, rv } from '../shared/styles/responsive';
 import { AppDispatch, RootState } from '../store/store';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp } from '@react-navigation/native';
 import { getWeather } from '../store/weatherAction';
-import { requestLocationPermission } from '../services/location_permission'
+import { requestLocationPermission } from '../services/location_permission';
+import Geolocation from '@react-native-community/geolocation';
 
 type SplashScreenProps = {
   navigation: NavigationProp<any>;
@@ -14,19 +15,45 @@ type SplashScreenProps = {
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   const { splashText, loading } = useSelector((state: RootState) => state.weather);
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
+  const [hasFetched, setHasFetched] = useState(false);
+
+  const fetchWeatherAndNavigate = async () => {
+    const locationPermission = await requestLocationPermission();
+    if (locationPermission && !hasFetched) {
+      const currentLocation = await getCurrentLocation();
+      if (currentLocation) {
+        dispatch(getWeather());
+        setHasFetched(true);
+
+        const timer = setTimeout(() => {
+          navigation.replace('HomeScreen');
+        }, 2000);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  };
+
+  const getCurrentLocation = async () => {
+    console.log('getCurrentLocation()');
+    Geolocation.getCurrentPosition(
+      (position) => {
+        console.log(position);
+        return true
+      },
+      (error) => {
+        console.log(error.code, error.message);
+        return false
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+    return false
+  }
 
   useEffect(() => {
-    requestLocationPermission();
-    dispatch(getWeather())
-    if(!loading) {
-      const timer = setTimeout(() => {
-        navigation.replace('HomeScreen')
-      }, 2000);
-  
-      return () => clearTimeout(timer);
-    }
-  }, [navigation]);
+    fetchWeatherAndNavigate();
+  }, [navigation, dispatch, hasFetched]);
 
   return (
     <View style={styles.container}>
@@ -64,6 +91,6 @@ const styles = StyleSheet.create({
   splashText: {
     color: Colors.white,
     fontSize: rs(14),
-    marginBottom: rv(10)
-  }
+    marginBottom: rv(10),
+  },
 });
