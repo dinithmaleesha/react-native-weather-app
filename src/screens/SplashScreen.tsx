@@ -8,21 +8,39 @@ import { NavigationProp } from '@react-navigation/native';
 import { getWeather } from '../store/weatherAction';
 import { requestLocationPermission } from '../services/location_permission';
 import Geolocation from '@react-native-community/geolocation';
+import packageJson from '../../package.json';
 
 type SplashScreenProps = {
   navigation: NavigationProp<any>;
 };
+
+interface Position {
+  coords: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    altitude?: number;
+    heading?: number;
+    speed?: number;
+  };
+}
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   const { splashText, loading } = useSelector((state: RootState) => state.weather);
   const dispatch = useDispatch<AppDispatch>();
   const [hasFetched, setHasFetched] = useState(false);
 
+  // TODO: need to enhance this method
   const fetchWeatherAndNavigate = async () => {
+    if (hasFetched) return;
     const locationPermission = await requestLocationPermission();
-    if (locationPermission && !hasFetched) {
-      const currentLocation = await getCurrentLocation();
-      if (currentLocation) {
+
+    if (locationPermission) {
+      try {
+        const position = await getCurrentLocation();
+        const { latitude, longitude } = position.coords;
+        console.log(latitude, longitude);
+        
         dispatch(getWeather());
         setHasFetched(true);
 
@@ -30,37 +48,40 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
           navigation.replace('HomeScreen');
         }, 2000);
 
-        return () => clearTimeout(timer);
+      } catch (error) {
+        console.log(error);
       }
     }
   };
 
-  const getCurrentLocation = async () => {
-    console.log('getCurrentLocation()');
-    Geolocation.getCurrentPosition(
-      (position) => {
-        console.log(position);
-        return true
-      },
-      (error) => {
-        console.log(error.code, error.message);
-        return false
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    );
-    return false
+  const getCurrentLocation = (): Promise<Position> => {
+    return new Promise((resolve, reject) => {
+      console.log('getCurrentLocation()');
+
+      Geolocation.getCurrentPosition(
+        (position) => {
+          console.log('Position OK');
+          resolve(position as Position);
+        },
+        (error) => {
+          console.log(error.code, error.message);
+          reject(error);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
+    })
   }
 
   useEffect(() => {
     fetchWeatherAndNavigate();
-  }, [navigation, dispatch, hasFetched]);
+  }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.appName}>Weather Wave</Text>
       <View style={styles.bottomContainer}>
         <Text style={styles.splashText}>{splashText}</Text>
-        <Text style={styles.bottomText}>Version 1.0.1</Text>
+        <Text style={styles.bottomText}>Version {packageJson.version}</Text>
       </View>
     </View>
   );
