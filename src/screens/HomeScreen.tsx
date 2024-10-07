@@ -27,11 +27,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   const setBackground = () => {
     const currentHour = new Date().getHours()
-    if (currentHour <= 5 && currentHour < 12) {
+    if (currentHour >= 5 && currentHour < 12) {
       setBackgroundImage(Images.morning)
-    } else if (currentHour <= 12 && currentHour < 16) {
+    } else if (currentHour >= 12 && currentHour < 16) {
       setBackgroundImage(Images.afternoon)
-    } else if (currentHour <= 16 && currentHour < 19) {
+    } else if (currentHour >= 16 && currentHour < 19) {
       setBackgroundImage(Images.evening)
     } else {
       setBackgroundImage(Images.night)
@@ -71,6 +71,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <View style={styles.weatherDetails}>
         <Text style={styles.title}>{currentTemperature} {temperatureUnit}</Text>
         <Text style={styles.time}>{new Date(time).toLocaleTimeString()}</Text>
+      </View>
+
+      <View style={styles.component}>
+        <UnderDevelopment />
       </View>
 
     </View>
@@ -114,4 +118,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
   },
+  component: {
+    flex: 1,
+    padding: 10,
+    marginTop: rv(30)
+  }
 });
