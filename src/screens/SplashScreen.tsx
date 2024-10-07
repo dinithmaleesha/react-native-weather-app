@@ -39,9 +39,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
       try {
         const position = await getCurrentLocation();
         const { latitude, longitude } = position.coords;
-        console.log(latitude, longitude);
         
-        dispatch(getWeather());
+        dispatch(getWeather({ latitude, longitude }));
         setHasFetched(true);
 
         const timer = setTimeout(() => {
@@ -56,11 +55,9 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
 
   const getCurrentLocation = (): Promise<Position> => {
     return new Promise((resolve, reject) => {
-      console.log('getCurrentLocation()');
 
       Geolocation.getCurrentPosition(
         (position) => {
-          console.log('Position OK');
           resolve(position as Position);
         },
         (error) => {

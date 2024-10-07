@@ -6,6 +6,7 @@ import { RootState } from '../store/store';
 import { Images } from '../shared/styles/images';
 import { rms, rs, rv } from '../shared/styles/responsive';
 import { Colors } from '../shared/styles/colors';
+import UnderDevelopment from '../shared/components/views/UnderDevelopment';
 
 type HomeScreenProps = {
   navigation: NavigationProp<any>;
@@ -19,8 +20,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     precipitation,
     time,
     rain, } = weather.weather.current;
-  const { 
-    temperature_2m: temperatureUnit  } = weather.weather.current_units;
+  const {
+    temperature_2m: temperatureUnit } = weather.weather.current_units;
   const [backgroundImage, setBackgroundImage] = useState(Images.default)
   const [iconName, setIconName] = useState('weather-sunny')
 
@@ -69,6 +70,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
       <View style={styles.weatherDetails}>
         <Text style={styles.title}>{currentTemperature} {temperatureUnit}</Text>
+        <Text style={styles.time}>{new Date(time).toLocaleTimeString()}</Text>
       </View>
 
     </View>
@@ -95,13 +97,18 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   weatherDetails: {
-    marginTop: rv(80)
+    marginTop: rv(80),
+    alignItems: 'center'
   },
   title: {
     fontSize: rms(56),
     fontWeight: 'bold',
     marginBottom: 20,
     color: Colors.white
+  },
+  time: {
+    fontSize: rms(14),
+    color: Colors.gray
   },
   text: {
     fontSize: 18,

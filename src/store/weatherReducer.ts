@@ -37,7 +37,7 @@ export const weatherSlice = createSlice({
         getWeather.rejected,
         (state, actions) => {
           state.weather = []
-          state.loading = false
+          state.loading = true
           state.splashText = 'Please try again later'
         }
       )

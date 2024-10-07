@@ -6,5 +6,6 @@ export const Colors = {
     fontPrimary: '#0D47A1',
     fontSecondary: '#546E7A',
     components: ' #BBDEFB',
-    accent: '#FFCA28'
+    accent: '#FFCA28',
+    gray: '#D3D3D3',
 }
